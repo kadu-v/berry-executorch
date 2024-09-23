@@ -1,0 +1,36 @@
+{
+    "name": "Executorch-rs",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "runArgs": [],
+    "remoteUser": "vscode",
+    "customizations": {
+        // Configure properties specific to VS Code.
+        "vscode": {
+            // Set *default* container specific settings.json values on container create.
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "editor.formatOnSave": true
+            },
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "ms-python.python",
+                "ms-toolsai.jupyter",
+                "rust-lang.rust-analyzer",
+            ]
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "username": "vscode",
+            "uid": "automatic",
+            "gid": "automatic",
+            "installZsh": true,
+            "installOhMyZsh": true,
+            "upgradePackages": false,
+            "nonFreePackages": false
+        }
+    }
+}
