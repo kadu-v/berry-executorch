@@ -64,18 +64,18 @@ if [[ $TARGET_TRIPLE == "aarch64-unknown-linux-gnu" ]]; then
     # Build the project
     (
         cd $EXECUTORCH_DIR
-        # cmake . -B $BUILD_DIR \
-        #     -DEXECUTORCH_BUILD_EXTENSION_TENSOR=ON \
-        #     -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
-        #     -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
-        #     -DEXECUTORCH_BUILD_EXTENSION_RUNNER_UTIL=ON \
-        #     -DEXECUTORCH_BUILD_EXECUTOR_RUNNER=OFF \
-        #     -DCMAKE_BUILD_TYPE=$BUILD_MODE 
+        cmake . -B $BUILD_DIR \
+            -DEXECUTORCH_BUILD_EXTENSION_TENSOR=ON \
+            -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
+            -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
+            -DEXECUTORCH_BUILD_EXTENSION_RUNNER_UTIL=ON \
+            -DEXECUTORCH_BUILD_EXECUTOR_RUNNER=OFF \
+            -DCMAKE_BUILD_TYPE=$BUILD_MODE 
         cd $BUILD_DIR
-        # make -j4
-        # cmake --install . --prefix $EXECUTORCH_DIR/../lib/$TARGET_TRIPLE
+        make -j4
+        cmake --install . --prefix $EXECUTORCH_DIR/../lib/$TARGET_TRIPLE
 
-        # println "Extract all headers from executorch and copy them to the include directory"
+        println "Extract all headers from executorch and copy them to the include directory"
         cd $EXECUTORCH_DIR
         mkdir -p $EXECUTORCH_DIR/../lib/include/executorch
         find . -name "*.h" -exec cp --parents {} $EXECUTORCH_DIR/../lib/include/executorch \;        
