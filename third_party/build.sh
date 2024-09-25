@@ -10,7 +10,7 @@ BUILD_MODE=Release
 ###############################################################################
 function usage() {
     echo "Usage: $0 --target=<target> [--clean] [--mode=<mode>]"
-    echo "--target: target architecture (e.g., aarch64-unknown-linux-gnu)"
+    echo "--target: target architecture (e.g., aarch64-unknown-linux-gnu, apple-*)"
     echo "--clean: clean the build directory"
     echo "--mode: build mode (e.g., Release, Debug)"
 }
@@ -101,7 +101,7 @@ if [[ $TARGET_TRIPLE == "aarch64-unknown-linux-gnu" ]]; then
         mkdir -p $EXECUTORCH_DIR/../lib/include/executorch
         find . -name "*.h" -exec cp --parents {} $EXECUTORCH_DIR/../lib/include/executorch \;        
     )
-elif [[ $TARGET_TRIPLE == "aarch64-apple-darwin" ]] || [[ $TARGET_TRIPLE == "arm64-apple-ios" ]] || [[ $TARGET_TRIPLE == "arm64-apple-ios-sim" ]]; then
+elif [[ $TARGET_TRIPLE == "aarch64-*" ]]; then
     println "Building for ${TARGET_TRIPLE}"
     (
         cd $EXECUTORCH_DIR
@@ -120,6 +120,27 @@ elif [[ $TARGET_TRIPLE == "aarch64-apple-darwin" ]] || [[ $TARGET_TRIPLE == "arm
             --portable \
             --quantized \
             --xnnpack
+    )
+
+    (
+        println "Extract all headers from executorch and copy them to the include directory for \"aarch64-apple-darwin\""
+        cd $BUILD_DIR
+
+        cmake --install . --prefix $EXECUTORCH_DIR/../lib/aarch64-apple-darwin
+    )
+
+    (
+        println "Extract all headers from executorch and copy them to the include directory for \"arm64-apple-ios\""
+        cd $BUILD_DIR
+
+        cmake --install . --prefix $EXECUTORCH_DIR/../lib/arm64-apple-ios
+    )
+
+    (
+        println "Extract all headers from executorch and copy them to the include directory for \"arm64-apple-ios-sim\""
+        cd $BUILD_DIR
+
+        cmake --install . --prefix $EXECUTORCH_DIR/../lib/arm64-apple-ios-sim
     )
 elif [[ ! -z $TARGET_TRIPLE ]]; then
     println "Unsupported target architecture: $TARGET_TRIPLE"
