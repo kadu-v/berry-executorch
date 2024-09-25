@@ -3,13 +3,13 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EXECUTORCH_DIR=$SCRIPT_DIR/executorch
 BUILD_DIR=$EXECUTORCH_DIR/cmake-out
 BUILD_MODE=Release
-set -ex
 
 
 ###############################################################################
 # Auxiliary functions                                                         #
 ###############################################################################
 function usage() {
+    echo "Usage: $0 --target=<target> [--clean] [--mode=<mode>]"
     echo "--target: target architecture (e.g., aarch64-unknown-linux-gnu)"
     echo "--clean: clean the build directory"
     echo "--mode: build mode (e.g., Release, Debug)"
@@ -47,6 +47,27 @@ if [[ -z "$TARGET_TRIPLE" ]] && [[ -z "$CLEAN" ]]; then
     exit 1
 fi
 
+# Check the MacOS environment
+if [[ $(uname) == "Darwin" ]]; then
+    println "Checking python environment is activated"
+    if [[ -z "$VIRTUAL_ENV" ]]; then
+        echo "Please activate a python environment"
+        exit 1
+    fi
+
+    println "Checking buck2 version"
+    BUCK2_VERSION=$(cat ${SCRIPT_DIR}/executorch/.ci/docker/ci_commit_pins/buck2.txt)
+    BUCK2_EXECUTABLE="${SCRIPT_DIR}/executorch/buck-out/buck2-aarch64-apple-darwin"
+    if [[ ! -f "buck2/buck2-aarch64-apple-darwin" ]]; then
+        wget "https://github.com/facebook/buck2/releases/download/${BUCK2_VERSION}/buck2-aarch64-apple-darwin.zst"
+        unzstd buck2-aarch64-apple-darwin.zst
+        chmod u+x buck2-aarch64-apple-darwin
+        mv buck2-aarch64-apple-darwin $BUCK2_EXECUTABLE
+    else
+        echo "Buck2 already downloaded"
+    fi
+fi
+
 if [[ $TARGET_TRIPLE == "aarch64-unknown-linux-gnu" ]]; then
     println "Building for aarch64-unknown-linux-gnu"
 
@@ -79,6 +100,26 @@ if [[ $TARGET_TRIPLE == "aarch64-unknown-linux-gnu" ]]; then
         cd $EXECUTORCH_DIR
         mkdir -p $EXECUTORCH_DIR/../lib/include/executorch
         find . -name "*.h" -exec cp --parents {} $EXECUTORCH_DIR/../lib/include/executorch \;        
+    )
+elif [[ $TARGET_TRIPLE == "aarch64-apple-darwin" ]] || [[ $TARGET_TRIPLE == "arm64-apple-ios" ]] || [[ $TARGET_TRIPLE == "arm64-apple-ios-sim" ]]; then
+    println "Building for ${TARGET_TRIPLE}"
+    (
+        cd $EXECUTORCH_DIR
+        sed -i '' 's/set -euo pipefail//g' build/build_apple_frameworks.sh
+
+        println "Building frameworks"
+        ./build/build_apple_frameworks.sh \
+            --output=cmake-out \
+            --toolchain=third-party/ios-cmake/ios.toolchain.cmake \
+            --buck2=$BUCK2_EXECUTABLE \
+            --python=$(which python) \
+            --coreml \
+            --custom \
+            --mps \
+            --optimized \
+            --portable \
+            --quantized \
+            --xnnpack
     )
 elif [[ ! -z $TARGET_TRIPLE ]]; then
     println "Unsupported target architecture: $TARGET_TRIPLE"
