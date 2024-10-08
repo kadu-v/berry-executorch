@@ -1,0 +1,9 @@
+[target.aarch64-apple-darwin]
+linker = "clang"
+rustflags = [
+    "-C",
+    "link-arg=-mmacosx-version-min=15.0",
+    # refer to the following link for more information
+    # https://ort.pyke.io/perf/execution-providers#coreml
+    "-Clink-arg=-fapple-link-rtlib",
+]

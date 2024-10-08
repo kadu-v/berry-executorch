@@ -13,14 +13,19 @@ void c_drop_module(CModule *module);
 
 int c_load(CModule *module);
 
-// This function executes the forward method of the module.
-// Safety:
-// - input: Not owned by C++, and must be valid for the lifetime of the call.
-// - dim: The number of dimensions in the input tensor.
-// - sizes: The size of the input tensor at each dimension.
-// - output: Moved to the caller.
-int c_forward(CModule *module, float *input, int dim, int32_t sizes[],
-              float **output);
+int c_forward(CModule *module, float *input, int32_t input_dim,
+              int32_t input_sizes[], int32_t output_dim, int32_t output_sizes[],
+              int32_t *found_output_dim, int32_t *found_output_sizes,
+              float *output);
+
+// // This function executes the forward method of the module.
+// // Safety:
+// // - input: Not owned by C++, and must be valid for the lifetime of the call.
+// // - dim: The number of dimensions in the input tensor.
+// // - sizes: The size of the input tensor at each dimension.
+// // - output: Moved to the caller.
+// int c_forward(CModule *module, float *input, int dim, int32_t sizes[],
+//               float **output);
 
 #ifdef __cplusplus
 }

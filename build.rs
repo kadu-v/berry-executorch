@@ -1,7 +1,8 @@
 use std::{env, path::Path};
 
 fn main() {
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
+    let manifest_dir =
+        env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
     let current_path = Path::new(&manifest_dir);
 
     cc::Build::new()
@@ -24,21 +25,53 @@ fn main() {
         current_path.display(),
         target_triple,
     );
-    let libs = vec![
-        "executorch",
-        "extension_data_loader",
+
+    #[allow(unused_mut)]
+    let mut libs = vec![
         "extension_tensor",
         "extension_module_static",
+        "extension_data_loader",
         "executorch_no_prim_ops",
-        // "extension_runner_util",
-        // "extension_threadpool",
-        // "pthreadpool",
     ];
-    for lib in libs {
-        println!("cargo:rustc-link-lib=static:+whole-archive={}", lib);
+    #[cfg(feature = "xnnpack")]
+    {
+        libs.push("xnnpack_backend");
+        libs.push("XNNPACK");
+        libs.push("pthreadpool");
+        libs.push("cpuinfo");
     }
-    let whole_archive_libs = vec!["portable_ops_lib", "portable_kernels"];
+    for lib in libs {
+        println!("cargo:rustc-link-lib=static={}", lib);
+    }
+
+    #[allow(unused_mut)]
+    let mut whole_archive_libs = vec![
+        "executorch", // Why should I link this library as a whole archive?
+        "portable_ops_lib",
+        "portable_kernels",
+    ];
+    #[cfg(feature = "mps")]
+    {
+        whole_archive_libs.push("mpsdelegate");
+        println!("cargo:rustc-link-arg=-weak_framework");
+        println!("cargo:rustc-link-arg=MetalPerformanceShaders");
+        println!("cargo:rustc-link-arg=-weak_framework");
+        println!("cargo:rustc-link-arg=MetalPerformanceShadersGraph");
+        println!("cargo:rustc-link-arg=-weak_framework");
+        println!("cargo:rustc-link-arg=Metal");
+    }
+    #[cfg(feature = "coreml")]
+    {
+        whole_archive_libs.push("coremldelegate");
+        println!("cargo:rustc-link-arg=-framework");
+        println!("cargo:rustc-link-arg=CoreML");
+        println!("cargo:rustc-link-arg=-framework");
+        println!("cargo:rustc-link-arg=Accelerate");
+        println!("cargo:rustc-link-lib=sqlite3");
+    }
     for lib in whole_archive_libs {
         println!("cargo:rustc-link-lib=static:+whole-archive={}", lib);
     }
+    println!("cargo:rustc-link-arg=-framework");
+    println!("cargo:rustc-link-arg=Foundation");
 }
