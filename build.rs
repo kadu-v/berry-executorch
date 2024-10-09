@@ -28,6 +28,7 @@ fn main() {
 
     #[allow(unused_mut)]
     let mut libs = vec![
+        "executorch", // Why should this library be linked as a whole archive?
         "extension_tensor",
         "extension_module_static",
         "extension_data_loader",
@@ -40,19 +41,26 @@ fn main() {
         libs.push("pthreadpool");
         libs.push("cpuinfo");
     }
-    for lib in libs {
-        println!("cargo:rustc-link-lib=static={}", lib);
-    }
 
+    #[rustfmt::skip]
     #[allow(unused_mut)]
     let mut whole_archive_libs = vec![
-        "executorch", // Why should I link this library as a whole archive?
         "portable_ops_lib",
         "portable_kernels",
     ];
+
+    /* ---------- MacOS, iOS extra library configuration ---------------------- */
+    #[cfg(any(target_os = "macos", target_os = "ios"))]
+    {
+        println!("cargo:rustc-link-arg=-framework");
+        println!("cargo:rustc-link-arg=Foundation");
+        println!("cargo:rustc-link-arg=-fapple-link-rtlib");
+    }
+
+    /* Metal backend configuration */
     #[cfg(feature = "mps")]
     {
-        whole_archive_libs.push("mpsdelegate");
+        libs.push("mpsdelegate");
         println!("cargo:rustc-link-arg=-weak_framework");
         println!("cargo:rustc-link-arg=MetalPerformanceShaders");
         println!("cargo:rustc-link-arg=-weak_framework");
@@ -60,6 +68,8 @@ fn main() {
         println!("cargo:rustc-link-arg=-weak_framework");
         println!("cargo:rustc-link-arg=Metal");
     }
+
+    /* CoreML backend configuration */
     #[cfg(feature = "coreml")]
     {
         whole_archive_libs.push("coremldelegate");
@@ -69,9 +79,12 @@ fn main() {
         println!("cargo:rustc-link-arg=Accelerate");
         println!("cargo:rustc-link-lib=sqlite3");
     }
+
+    for lib in libs {
+        println!("cargo:rustc-link-lib=static={}", lib);
+    }
+
     for lib in whole_archive_libs {
         println!("cargo:rustc-link-lib=static:+whole-archive={}", lib);
     }
-    println!("cargo:rustc-link-arg=-framework");
-    println!("cargo:rustc-link-arg=Foundation");
 }

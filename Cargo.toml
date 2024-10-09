@@ -8,9 +8,12 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]
 default = []
+apple = ["coreml", "mps", "xnnpack"]
 xnnpack = []
 coreml = []
 mps = []
+
+android = ["xnnpack", "vulkan"]
 vulkan = []
 
 
