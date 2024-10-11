@@ -1,9 +1,16 @@
-use std::{env, path::Path};
+#[allow(unused_imports)]
+use dotenvy::from_filename_override;
+use std::{env, path::Path, thread::panicking};
 
 fn main() {
     let manifest_dir =
         env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
     let current_path = Path::new(&manifest_dir);
+    #[cfg(feature = "android")]
+    {
+        from_filename_override("android.env")
+            .expect("Failed to load android.env");
+    }
 
     cc::Build::new()
         .cpp(true)
@@ -34,6 +41,14 @@ fn main() {
         "extension_data_loader",
         "executorch_no_prim_ops",
     ];
+
+    #[rustfmt::skip]
+    #[allow(unused_mut)]
+    let mut whole_archive_libs = vec![
+        "portable_ops_lib",
+        "portable_kernels",
+    ];
+    /* ---------- Common extra library configuration ---------------------- */
     #[cfg(feature = "xnnpack")]
     {
         libs.push("xnnpack_backend");
@@ -42,15 +57,8 @@ fn main() {
         libs.push("cpuinfo");
     }
 
-    #[rustfmt::skip]
-    #[allow(unused_mut)]
-    let mut whole_archive_libs = vec![
-        "portable_ops_lib",
-        "portable_kernels",
-    ];
-
     /* ---------- MacOS, iOS extra library configuration ---------------------- */
-    #[cfg(any(target_os = "macos", target_os = "ios"))]
+    #[cfg(feature = "apple")]
     {
         println!("cargo:rustc-link-arg=-framework");
         println!("cargo:rustc-link-arg=Foundation");
@@ -78,6 +86,12 @@ fn main() {
         println!("cargo:rustc-link-arg=-framework");
         println!("cargo:rustc-link-arg=Accelerate");
         println!("cargo:rustc-link-lib=sqlite3");
+    }
+
+    /* ---------- Android extra library configuration ---------------------- */
+    #[cfg(feature = "vulkan")]
+    {
+        libs.push("vulkan_backend");
     }
 
     for lib in libs {

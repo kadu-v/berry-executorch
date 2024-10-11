@@ -101,7 +101,25 @@ if [[ $TARGET_TRIPLE == "aarch64-unknown-linux-gnu" ]] || [[ $TARGET_TRIPLE == "
         mkdir -p $EXECUTORCH_DIR/../executorch_lib/include/executorch
         find . -name "*.h" -exec cp --parents {} $EXECUTORCH_DIR/../executorch_lib/include/executorch \;        
     )
-elif [[ $TARGET_TRIPLE == "aarch64-*" ]]; then
+elif [[ $TARGET_TRIPLE == "aarch64-linux-android" ]]; then
+    println "Building for ${TARGET_TRIPLE}"
+    ANDROID_NDK=/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566
+    (
+        cd $EXECUTORCH_DIR
+        cmake . -B $BUILD_DIR \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=arm64-v8a \
+            -DEXECUTORCH_BUILD_VULKAN=ON \
+            -DEXECUTORCH_BUILD_XNNPACK=ON \
+            -DEXECUTORCH_BUILD_EXTENSION_TENSOR=ON \
+            -DEXECUTORCH_BUILD_EXTENSION_MODULE=ON \
+            -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
+            -DPYTHON_EXECUTABLE=python \
+            -DCMAKE_BUILD_TYPE=$BUILD_MODE \
+            -DCMAKE_INSTALL_PREFIX=$EXECUTORCH_DIR/../executorch_lib/$TARGET_TRIPLE
+        cmake --build $BUILD_DIR -j$(nproc) --target install
+    )
+elif [[ $TARGET_TRIPLE == "aarch64-apple-*" ]]; then
     println "Building for ${TARGET_TRIPLE}"
     (
         cd $EXECUTORCH_DIR

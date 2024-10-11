@@ -23,5 +23,7 @@ thiserror = "1.0.64"
 [dev-dependencies]
 imageproc = "0.25.0"
 
+
 [build-dependencies]
 cc = "1.1.25"
+dotenvy = "0.15.7"
