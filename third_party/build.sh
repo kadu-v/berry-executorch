@@ -94,12 +94,12 @@ if [[ $TARGET_TRIPLE == "aarch64-unknown-linux-gnu" ]] || [[ $TARGET_TRIPLE == "
             -DCMAKE_BUILD_TYPE=$BUILD_MODE 
         cd $BUILD_DIR
         make -j$(nproc)
-        cmake --install . --prefix $EXECUTORCH_DIR/../executorch_lib/$TARGET_TRIPLE
+        cmake --install . --prefix $EXECUTORCH_DIR/../executorch-lib/$TARGET_TRIPLE
 
         println "Extract all headers from executorch and copy them to the include directory"
         cd $EXECUTORCH_DIR
-        mkdir -p $EXECUTORCH_DIR/../executorch_lib/include/executorch
-        find . -name "*.h" -exec cp --parents {} $EXECUTORCH_DIR/../executorch_lib/include/executorch \;        
+        mkdir -p $EXECUTORCH_DIR/../executorch-lib/include/executorch
+        find . -name "*.h" -exec cp --parents {} $EXECUTORCH_DIR/../executorch-lib/include/executorch \;        
     )
 elif [[ $TARGET_TRIPLE == "aarch64-linux-android" ]]; then
     println "Building for ${TARGET_TRIPLE}"
@@ -116,7 +116,7 @@ elif [[ $TARGET_TRIPLE == "aarch64-linux-android" ]]; then
             -DEXECUTORCH_BUILD_EXTENSION_DATA_LOADER=ON \
             -DPYTHON_EXECUTABLE=python \
             -DCMAKE_BUILD_TYPE=$BUILD_MODE \
-            -DCMAKE_INSTALL_PREFIX=$EXECUTORCH_DIR/../executorch_lib/$TARGET_TRIPLE
+            -DCMAKE_INSTALL_PREFIX=$EXECUTORCH_DIR/../executorch-lib/$TARGET_TRIPLE
         cmake --build $BUILD_DIR -j$(nproc) --target install
     )
 elif [[ $TARGET_TRIPLE == "aarch64-apple-*" ]]; then
@@ -144,21 +144,21 @@ elif [[ $TARGET_TRIPLE == "aarch64-apple-*" ]]; then
         println "Extract all headers from executorch and copy them to the include directory for \"aarch64-apple-darwin\""
         cd $BUILD_DIR
 
-        cmake --install . --prefix $EXECUTORCH_DIR/../executorch_lib/aarch64-apple-darwin
+        cmake --install . --prefix $EXECUTORCH_DIR/../executorch-lib/aarch64-apple-darwin
     )
 
     (
         println "Extract all headers from executorch and copy them to the include directory for \"arm64-apple-ios\""
         cd $BUILD_DIR
 
-        cmake --install . --prefix $EXECUTORCH_DIR/../executorch_lib/arm64-apple-ios
+        cmake --install . --prefix $EXECUTORCH_DIR/../executorch-lib/arm64-apple-ios
     )
 
     (
         println "Extract all headers from executorch and copy them to the include directory for \"arm64-apple-ios-sim\""
         cd $BUILD_DIR
 
-        cmake --install . --prefix $EXECUTORCH_DIR/../executorch_lib/arm64-apple-ios-sim
+        cmake --install . --prefix $EXECUTORCH_DIR/../executorch-lib/arm64-apple-ios-sim
     )
 elif [[ ! -z $TARGET_TRIPLE ]]; then
     println "Unsupported target architecture: $TARGET_TRIPLE"

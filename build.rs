@@ -16,7 +16,7 @@ fn main() {
         .cpp(true)
         .file("src/cpp/c_interface.cpp")
         .include("src/cpp")
-        .include("third_party/executorch_lib/include")
+        .include("third_party/executorch-lib/include")
         .flag("-std=c++17")
         .compile("c_interface");
     println!("cargo:rerun-if-changed=cpp/src/c_interface.cpp");
@@ -28,7 +28,7 @@ fn main() {
     --------------------------------------------------------------------------- */
     let target_triple = env::var("TARGET").unwrap();
     println!(
-        "cargo:rustc-link-search={}/third_party/executorch_lib/{}/lib",
+        "cargo:rustc-link-search={}/third_party/executorch-lib/{}/lib",
         current_path.display(),
         target_triple,
     );
