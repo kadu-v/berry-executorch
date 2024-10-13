@@ -35,7 +35,6 @@ fn main() {
 
     #[allow(unused_mut)]
     let mut libs = vec![
-        "executorch", // Why should this library be linked as a whole archive?
         "extension_tensor",
         "extension_module_static",
         "extension_data_loader",
@@ -45,6 +44,7 @@ fn main() {
     #[rustfmt::skip]
     #[allow(unused_mut)]
     let mut whole_archive_libs = vec![
+        "executorch", // Why should this library be linked as a whole archive?
         "portable_ops_lib",
         "portable_kernels",
     ];
