@@ -68,7 +68,7 @@ fn main() {
     /* Metal backend configuration */
     #[cfg(feature = "mps")]
     {
-        libs.push("mpsdelegate");
+        whole_archive_libs.push("mpsdelegate");
         println!("cargo:rustc-link-arg=-weak_framework");
         println!("cargo:rustc-link-arg=MetalPerformanceShaders");
         println!("cargo:rustc-link-arg=-weak_framework");
