@@ -8,9 +8,8 @@ fn main() {
 
     let input = vec![1.0];
     let input_sizes = vec![1];
-    let output_sizes = vec![1];
     let output = module
-        .forward(&input, &input_sizes, &output_sizes)
+        .forward(&input, &input_sizes)
         .expect("Failed to forward the module");
     println!("[1] + [1] = [{}]", output.data[0]);
 }

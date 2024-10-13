@@ -2,7 +2,9 @@ use crate::c_interface;
 use crate::c_interface::{c_new_module, CModule};
 use crate::error::ExecutorchError;
 use crate::tensor::Tensor;
+use std::alloc::{dealloc, Layout};
 use std::ffi::NulError;
+use std::mem;
 use std::result::Result;
 
 /// Executorch module.
@@ -34,42 +36,45 @@ impl Module {
         &self,
         input: &[f32],
         input_sizes: &[i32],
-        output_sizes: &[i32],
     ) -> Result<Tensor, ExecutorchError> {
-        let output_numel =
-            output_sizes.iter().fold(1, |acc, &x| acc * x as usize);
-        let mut found_output_dim = 0;
-        let mut found_output_sizes = vec![0; output_numel];
-        let mut output = vec![0.0; output_numel];
-        let status = unsafe {
+        let c_tensor = unsafe {
             c_interface::c_forward(
                 self.c_module,
                 input.as_ptr(),
                 input_sizes.len() as i32,
                 input_sizes.as_ptr(),
-                output_sizes.len() as i32,
-                output_sizes.as_ptr(),
-                &mut found_output_dim,
-                found_output_sizes.as_mut_ptr(),
-                output.as_mut_ptr(),
             )
         };
 
-        let output_dim = output_sizes.len() as i32;
-        match status {
-            -1 => Err(ExecutorchError::ShapeMismatch {
-                expected: vec![output_dim],
-                found: vec![0],
-            }),
-            -2 => Err(ExecutorchError::ShapeMismatch {
-                expected: vec![output_dim],
-                found: vec![found_output_dim],
-            }),
-            -3 => Err(ExecutorchError::ShapeMismatch {
-                expected: output_sizes.to_vec(),
-                found: found_output_sizes,
-            }),
-            _ => Ok(Tensor::new(output, found_output_sizes, output_dim)),
+        if c_tensor.error != 0 {
+            return Err(ExecutorchError::FailedToForward(c_tensor.error));
         }
+
+        let dim = c_tensor.dim as usize;
+        let sizes = unsafe { std::slice::from_raw_parts(c_tensor.sizes, dim) };
+        let len = sizes.iter().product::<i32>() as usize;
+        let data =
+            unsafe { std::slice::from_raw_parts_mut(c_tensor.data, len) };
+
+        // Copy the output tensor data to a new Vec<f32>.
+        // TODO: hava a better way to avoid copying the data.
+        let tensor = Tensor::new(data.to_vec(), sizes.to_vec(), dim as i32);
+
+        // Drop the output tensor.
+        unsafe {
+            let data_layout = Layout::from_size_align_unchecked(
+                mem::size_of::<f32>() * len,
+                mem::align_of::<f32>(),
+            );
+            dealloc(c_tensor.data as *mut u8, data_layout);
+
+            let sizes_layout = Layout::from_size_align_unchecked(
+                mem::size_of::<i32>() * dim,
+                mem::align_of::<i32>(),
+            );
+            dealloc(c_tensor.sizes as *mut u8, sizes_layout);
+        }
+
+        return Ok(tensor);
     }
 }

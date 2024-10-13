@@ -17,79 +17,78 @@ using torch::executor::Tensor;
 using torch::executor::TensorImpl;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
+  struct CModule
+  {
+    Module *internal;
+  } typedef CModule;
 
-struct CModule {
-  Module *internal;
-} typedef CModule;
-
-CModule *c_new_module(const char *file_path) {
-  return new CModule{new Module(file_path)};
-}
-
-void c_drop_module(CModule *module) {
-  delete module->internal;
-  delete module;
-}
-
-int c_load(CModule *module) {
-  auto error = module->internal->load();
-  if (error != Error::Ok) {
-    return static_cast<int>(error);
-  }
-  return 0;
-}
-
-int c_forward(CModule *module, float *input, int32_t input_dim,
-              int32_t input_sizes[], int32_t output_dim, int32_t output_sizes[],
-              int32_t *found_output_dim, int32_t *found_output_sizes,
-              float *output) {
-  TensorImpl tensor_impl(ScalarType::Float, input_dim, input_sizes, input);
-  auto result = module->internal->forward({EValue(Tensor(&tensor_impl))});
-  if (!result.ok()) {
-    return static_cast<int>(result.error());
+  CModule *c_new_module(const char *file_path)
+  {
+    return new CModule{new Module(file_path)};
   }
 
-  const auto output_tensor = result->at(0).toTensor();
-  // Copy the output dim
-  if (output_tensor.dim() < 0) {
-    return -1;
+  void c_drop_module(CModule *module)
+  {
+    delete module->internal;
+    delete module;
   }
 
-  *found_output_dim = output_tensor.dim();
-  if (output_tensor.dim() != output_dim) {
-    return -2;
-  }
-
-  // Copy the output sizes
-  auto output_tensor_size = output_tensor.sizes();
-  for (int i = 0; i < output_dim; i++) {
-    found_output_sizes[i] = output_tensor_size[i];
-  }
-  for (int i = output_dim; i < output_tensor.dim(); i++) {
-    if (output_tensor_size[i] != output_sizes[i]) {
-      return -3;
+  int c_load(CModule *module)
+  {
+    auto error = module->internal->load();
+    if (error != Error::Ok)
+    {
+      return static_cast<int>(error);
     }
+    return 0;
   }
 
-  // Copy the output tensor
-  const auto output_data = output_tensor.const_data_ptr<float>();
-  auto output_size = output_tensor.numel();
-  std::copy(output_data, output_data + output_size, output);
-  return 0;
-}
+  CTensor c_forward(CModule *module, float *input, int32_t input_dim, int32_t *input_sizes)
+  {
+    TensorImpl tensor_impl(ScalarType::Float, input_dim, input_sizes, input);
 
-// int c_forward(CModule *module, float *input, int dim, int32_t sizes[],
-//               float **output) {
-//   TensorImpl tensor_impl(ScalarType::Float, dim, sizes, input);
-//   auto result = module->internal->forward({EValue(Tensor(&tensor_impl))});
-//   if (!result.ok()) {
-//     return static_cast<int>(result.error());
-//   }
-//   *output = std::move(result->at(0)).toTensor().data_ptr<float>();
-//   return 0;
-// }
+    auto result = module->internal->forward({EValue(Tensor(&tensor_impl))});
+    if (!result.ok())
+    {
+      return CTensor{
+          static_cast<int>(result.error()),
+          nullptr,
+          -1,
+          nullptr};
+    }
+
+    const auto output_tensor = result->at(0).toTensor();
+    const float *output_ptr = output_tensor.const_data_ptr<float>();
+
+    float *output = new float[output_tensor.numel()];
+    std::copy(output_ptr, output_ptr + output_tensor.numel(), output);
+
+    int32_t output_dim = output_tensor.dim();
+
+    int32_t *output_sizes = new int32_t[output_tensor.dim()];
+    std::copy(output_tensor.sizes().begin(), output_tensor.sizes().end(), output_sizes);
+    // Copy the output tensor to the output array and this is not owned by the callee
+
+    return CTensor{
+        0,
+        output,
+        output_dim,
+        output_sizes};
+  }
+
+  // int c_forward(CModule *module, float *input, int dim, int32_t sizes[],
+  //               float **output) {
+  //   TensorImpl tensor_impl(ScalarType::Float, dim, sizes, input);
+  //   auto result = module->internal->forward({EValue(Tensor(&tensor_impl))});
+  //   if (!result.ok()) {
+  //     return static_cast<int>(result.error());
+  //   }
+  //   *output = std::move(result->at(0)).toTensor().data_ptr<float>();
+  //   return 0;
+  // }
 
 #ifdef __cplusplus
 }

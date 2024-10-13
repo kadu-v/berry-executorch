@@ -65,9 +65,8 @@ fn main() {
     // Forward model
     let input_sizes =
         vec![1, 3, input_image_height as i32, input_image_width as i32];
-    let output_sizes = vec![1, 1000];
     let output = module
-        .forward(&normalized_image, &input_sizes, &output_sizes)
+        .forward(&normalized_image, &input_sizes)
         .expect("Failed to forward the module");
 
     // Softmax

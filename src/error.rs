@@ -6,4 +6,6 @@ pub enum ExecutorchError {
     FailedToLoad(i32),
     #[error("MismatchShape: expected: {expected:?}, found: {found:?}")]
     ShapeMismatch { expected: Vec<i32>, found: Vec<i32> },
+    #[error("FailedToForward: {0}")]
+    FailedToForward(i32),
 }

@@ -11,6 +11,14 @@ pub struct CModule {
     _private: [u8; 0],
 }
 
+#[repr(C)]
+pub struct CTensor {
+    pub error: i32,
+    pub data: *mut f32,
+    pub dim: i32,
+    pub sizes: *mut i32,
+}
+
 extern "C" {
     /// Create a new executorch module.
     ///
@@ -43,10 +51,5 @@ extern "C" {
         input: *const f32,
         input_dim: i32,
         input_sizes: *const i32,
-        output_dim: i32,
-        output_sizes: *const i32,
-        found_output_dim: *mut i32,
-        found_output_sizes: *mut i32,
-        output: *mut f32,
-    ) -> i32;
+    ) -> CTensor;
 }
