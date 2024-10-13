@@ -1,6 +1,6 @@
 #[allow(unused_imports)]
 use dotenvy::from_filename_override;
-use std::{env, path::Path, thread::panicking};
+use std::{env, path::Path};
 
 fn main() {
     let manifest_dir =
