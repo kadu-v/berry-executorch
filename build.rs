@@ -51,10 +51,10 @@ fn main() {
     /* ---------- Common extra library configuration ---------------------- */
     #[cfg(feature = "xnnpack")]
     {
-        libs.push("xnnpack_backend");
-        libs.push("XNNPACK");
-        libs.push("pthreadpool");
-        libs.push("cpuinfo");
+        whole_archive_libs.push("xnnpack_backend");
+        whole_archive_libs.push("XNNPACK");
+        whole_archive_libs.push("pthreadpool");
+        whole_archive_libs.push("cpuinfo");
     }
 
     /* ---------- MacOS, iOS extra library configuration ---------------------- */
