@@ -2,6 +2,7 @@ use imageproc;
 use imageproc::image;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::path::Path;
 
 fn softmax(x: &Vec<f32>) -> Vec<f32> {
     let max_x = x.iter().fold(f32::NEG_INFINITY, |acc, &x| acc.max(x));
@@ -23,8 +24,11 @@ fn argmax(x: &Vec<f32>) -> usize {
 }
 
 fn main() {
+    let base_path = Path::new(env!("CARGO_MANIFEST_DIR"));
+
     // Load image
-    let image = image::open("./resource/image/dog.png").unwrap();
+    let image_path = base_path.join("resource/image/dog.png");
+    let image = image::open(image_path).unwrap();
     let image = image.to_rgb8();
     println!("Image: {:?}", image.dimensions());
 
@@ -54,37 +58,46 @@ fn main() {
     }
 
     // Load model
-    let file_path = "./resource/model/mv3/mv3.pte";
-    let file_path = "./resource/model/mv3/mv3_xnnpack_fp32.pte";
-    let file_path = "./resource/model/mv3/mv3_mps.pte";
-    let file_path = "./resource/model/mv3/mv3_coreml_all.pte";
-    let mut module = executorch_rs::Module::new(file_path)
-        .expect("Failed to create a new module");
-    module.load().unwrap();
+    let file_paths = vec![
+        // "resource/model/mv3/mv3.pte",
+        "resource/model/mv3/mv3_xnnpack_fp32.pte",
+        // "resource/model/mv3/mv3_mps.pte",
+        // "resource/model/mv3/mv3_coreml_all.pte",
+    ];
+    for file_path in file_paths {
+        println!("Model: {}", file_path);
+        let model_path = base_path.join(file_path);
+        let mut module =
+            executorch_rs::Module::new(&model_path.display().to_string())
+                .expect("Failed to create a new module");
+        module.load().unwrap();
 
-    // Forward model
-    let input_sizes =
-        vec![1, 3, input_image_height as i32, input_image_width as i32];
-    let output = module
-        .forward(&normalized_image, &input_sizes)
-        .expect("Failed to forward the module");
+        // Forward model
+        let input_sizes =
+            vec![1, 3, input_image_height as i32, input_image_width as i32];
+        let output = module
+            .forward(&normalized_image, &input_sizes)
+            .expect("Failed to forward the module");
 
-    // Softmax
-    let softmax_output = softmax(&output.data);
-    let class = argmax(&softmax_output);
+        // Softmax
+        let softmax_output = softmax(&output.data);
+        let class = argmax(&softmax_output);
 
-    // Load class file
-    let class_file = File::open("./resource/model/mv3/imagenet_classes.txt")
-        .expect("Failed to open class file");
-    let mut class_names = vec![];
-    let reader = BufReader::new(class_file);
-    for line in reader.lines() {
-        let line = line.expect("Failed to read class file");
-        class_names.push(line);
+        // Load class file
+        let class_file_path =
+            base_path.join("resource/model/mv3/imagenet_classes.txt");
+        let class_file =
+            File::open(class_file_path).expect("Failed to open class file");
+        let mut class_names = vec![];
+        let reader = BufReader::new(class_file);
+        for line in reader.lines() {
+            let line = line.expect("Failed to read class file");
+            class_names.push(line);
+        }
+        println!(
+            "Class No: \"{}\", Class Name: \"{}\"",
+            class,
+            class_names[class].to_uppercase()
+        );
     }
-    println!(
-        "Class No: \"{}\", Class Name: \"{}\"",
-        class,
-        class_names[class].to_uppercase()
-    );
 }
