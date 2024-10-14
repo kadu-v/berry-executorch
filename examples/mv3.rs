@@ -59,10 +59,10 @@ fn main() {
 
     // Load model
     let file_paths = vec![
-        // "resource/model/mv3/mv3.pte",
+        "resource/model/mv3/mv3.pte",
         "resource/model/mv3/mv3_xnnpack_fp32.pte",
-        // "resource/model/mv3/mv3_mps.pte",
-        // "resource/model/mv3/mv3_coreml_all.pte",
+        "resource/model/mv3/mv3_mps.pte",
+        "resource/model/mv3/mv3_coreml_all.pte",
     ];
     for file_path in file_paths {
         println!("Model: {}", file_path);
