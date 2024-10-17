@@ -6,26 +6,39 @@ fn main() {
     let manifest_dir =
         env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
     let current_path = Path::new(&manifest_dir);
+
+    /* ------------------------------------------------------------------------
+     *
+     * ------------------------------------------------------------------------ */
     #[cfg(feature = "android")]
     {
         from_filename_override("android.env")
             .expect("Failed to load android.env");
+        println!(
+            "cargo:rustc-link-search=/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android/35");
+        println!("cargo:rustc-link-search=/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android");
+        println!("cargo:include=/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include");
+        println!("cargo:include=/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/include")
     }
 
-    cc::Build::new()
+    let mut builder = cc::Build::new()
         .cpp(true)
         .file("src/cpp/c_interface.cpp")
         .include("src/cpp")
         .include("third_party/executorch-lib/include")
+        .include("/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include")
         .flag("-std=c++17")
+        .flag("-fexceptions")
+        .flag("-frtti")
+        .cpp_link_stdlib("c++_static")
         .compile("c_interface");
+
     println!("cargo:rerun-if-changed=cpp/src/c_interface.cpp");
     println!("cargo:rerun-if-changed=cpp/include/c_interface.h");
     println!("cargo:rerun-if-changed={}/build.rs", current_path.display());
-
     /* ------------------------------------------------------------------------
-    * Basic Linking Configuration
-    --------------------------------------------------------------------------- */
+     * Basic Linking Configuration
+     *--------------------------------------------------------------------------- */
     let target_triple = env::var("TARGET").unwrap();
     println!(
         "cargo:rustc-link-search={}/third_party/executorch-lib/{}/lib",
@@ -48,6 +61,7 @@ fn main() {
         "portable_ops_lib",
         "portable_kernels",
     ];
+
     /* ---------- Common extra library configuration ---------------------- */
     #[cfg(feature = "xnnpack")]
     {
@@ -89,9 +103,13 @@ fn main() {
     }
 
     /* ---------- Android extra library configuration ---------------------- */
+    #[cfg(feature = "android")]
+    {
+        println!("cargo:rustc-link-lib=c++abi");
+    }
     #[cfg(feature = "vulkan")]
     {
-        libs.push("vulkan_backend");
+        whole_archive_libs.push("vulkan_backend");
     }
 
     for lib in libs {
