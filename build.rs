@@ -56,7 +56,7 @@ fn main() {
         }
 
         let target_lib_path =
-            sysroot_target_path.join("usr/lib").join(target_triple);
+            sysroot_target_path.join("usr/lib").join(&target_triple);
         let platform_lib_path = sysroot_target_path
             .join("usr/lib")
             .join("aarch64-linux-android")
@@ -71,15 +71,15 @@ fn main() {
         println!("cargo:rustc-link-search={}", platform_lib_path.display());
         println!("cargo:rustc-link-search={}", target_lib_path.display());
         println!("cargo:include={}", include_path.display());
+
+        builder = builder
+            .flag("-fexceptions")
+            .flag("-frtti")
+            .cpp_link_stdlib("c++_static");
     }
 
     /* Compile C++ */
-    builder
-    .include("/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include")
-        .flag("-fexceptions")
-        .flag("-frtti")
-        .cpp_link_stdlib("c++_static")
-        .compile("c_interface");
+    builder.compile("c_interface");
 
     println!("cargo:rerun-if-changed=cpp/src/c_interface.cpp");
     println!("cargo:rerun-if-changed=cpp/include/c_interface.h");
@@ -88,7 +88,6 @@ fn main() {
     /* ------------------------------------------------------------------------
      * Basic Linking Configuration
      * ------------------------------------------------------------------------ */
-    let target_triple = env::var("TARGET").unwrap();
     println!(
         "cargo:rustc-link-search={}/third_party/executorch-lib/{}/lib",
         current_path.display(),

@@ -78,3 +78,11 @@ impl Module {
         return Ok(tensor);
     }
 }
+
+impl Drop for Module {
+    fn drop(&mut self) {
+        unsafe {
+            c_interface::c_drop_module(self.c_module);
+        }
+    }
+}

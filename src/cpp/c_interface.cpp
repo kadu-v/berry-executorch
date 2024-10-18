@@ -27,7 +27,10 @@ extern "C"
 
   CModule *c_new_module(const char *file_path)
   {
-    return new CModule{new Module(file_path)};
+    /** IMPORTANT: If the Default LoadMode (Mlock) is enable, the following error will be thrown:
+     *  Error: Mlock failed: Cannot allocate memory Out of memory
+     */
+    return new CModule{new Module(file_path, Module::LoadMode::Mmap)};
   }
 
   void c_drop_module(CModule *module)
