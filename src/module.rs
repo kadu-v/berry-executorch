@@ -25,7 +25,8 @@ impl Module {
     pub fn load(&mut self) -> Result<(), ExecutorchError> {
         let status = unsafe { c_interface::c_load(self.c_module) };
         if status != 0 {
-            Err(ExecutorchError::FailedToLoad(status))
+            let error = ExecutorchError::from_i32(status);
+            Err(error)
         } else {
             Ok(())
         }
@@ -47,7 +48,8 @@ impl Module {
         };
 
         if c_tensor.error != 0 {
-            return Err(ExecutorchError::FailedToForward(c_tensor.error));
+            let error = ExecutorchError::from_i32(c_tensor.error);
+            return Err(error);
         }
 
         let dim = c_tensor.dim as usize;
