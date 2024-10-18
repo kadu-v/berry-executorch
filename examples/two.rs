@@ -1,4 +1,4 @@
-use executorch_rs::{Module, Tensor};
+use executorch_rs::Module;
 
 fn main() {
     let file_path = "./resource/model/simple/two.pte";
