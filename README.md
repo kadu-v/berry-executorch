@@ -1,6 +1,9 @@
 # executorch-rs
 
-This is a Rust binding for the [executorch](https://pytorch.org/executorch-overview)
+This is the **simplest** Rust binding for the [executorch](https://pytorch.org/executorch-overview)
+
+> [!IMPORTANT]
+> This crate is under development and is not yet ready for production use.
 
 ## How to use
 1. Download the prebuilt executorch library from the [executorch-prebuilt](https://github.com/kadu-v/pre-built-executorch) website.
