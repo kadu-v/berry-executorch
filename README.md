@@ -2,7 +2,7 @@
 
 <p align="center">
     <img src="resource/image/logo.jpeg" alt="berry-executorch" width="200"　height="200">
-</p>J
+</p>
 
 
 This is the **simplest** Rust binding for the [executorch](https://pytorch.org/executorch-overview)
