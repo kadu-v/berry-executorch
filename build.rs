@@ -20,7 +20,7 @@ fn main() {
     let target_triple = env::var("TARGET").unwrap();
 
     let profile = env::var("PROFILE").unwrap();
-    let executorch_honme =
+    let executorch_home =
         if let Some(executorch_home) = env::var("EXECUTORCH_HOME").ok() {
             executorch_home
         } else {
@@ -38,7 +38,7 @@ fn main() {
         .cpp(true)
         .file("src/cpp/c_interface.cpp")
         .include("src/cpp")
-        .include("executorch-prebuilt/include")
+        .include(format!("{}/include", executorch_home))
         .flag("-std=c++17");
 
     #[cfg(feature = "android")]
@@ -117,7 +117,7 @@ fn main() {
 
     println!(
         "cargo:rustc-link-search={}/{}/{}/lib",
-        executorch_honme, target_triple, profile
+        executorch_home, target_triple, profile
     );
 
     #[allow(unused_mut)]
