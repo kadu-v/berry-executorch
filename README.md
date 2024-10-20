@@ -1,36 +1,73 @@
 # executorch-rs
 
-Requirement already satisfied: torch==2.5.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (2.5.0)
-Requirement already satisfied: torchvision==0.20.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (0.20.0)
-Requirement already satisfied: typing-extensions in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (4.12.2)
-Requirement already satisfied: cmake in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (3.30.3)
-Requirement already satisfied: pip>=23 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (24.2)
-Requirement already satisfied: pyyaml in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (6.0.2)
-Requirement already satisfied: setuptools>=63 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (75.1.0)
-Requirement already satisfied: tomli in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (2.0.1)
-Requirement already satisfied: wheel in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (0.44.0)
-Requirement already satisfied: zstd in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (1.5.5.1)
-Requirement already satisfied: timm==1.0.7 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (1.0.7)
-Requirement already satisfied: torchaudio==2.5.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (2.5.0)
-Requirement already satisfied: torchsr==1.0.4 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (1.0.4)
-Requirement already satisfied: transformers==4.42.4 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (4.42.4)
-Requirement already satisfied: filelock in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torch==2.5.0) (3.16.1)
-Requirement already satisfied: networkx in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torch==2.5.0) (3.3)
-Requirement already satisfied: jinja2 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torch==2.5.0) (3.1.4)
-Requirement already satisfied: fsspec in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torch==2.5.0) (2024.9.0)
-Requirement already satisfied: sympy==1.13.1 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torch==2.5.0) (1.13.1)
-Requirement already satisfied: numpy in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torchvision==0.20.0) (1.26.4)
-Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from torchvision==0.20.0) (10.4.0)
-Requirement already satisfied: huggingface_hub in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from timm==1.0.7) (0.25.1)
-Requirement already satisfied: safetensors in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from timm==1.0.7) (0.4.5)
-Requirement already satisfied: packaging>=20.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from transformers==4.42.4) (24.1)
-Requirement already satisfied: regex!=2019.12.17 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from transformers==4.42.4) (2024.9.11)
-Requirement already satisfied: requests in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from transformers==4.42.4) (2.32.3)
-Requirement already satisfied: tokenizers<0.20,>=0.19 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from transformers==4.42.4) (0.19.1)
-Requirement already satisfied: tqdm>=4.27 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from transformers==4.42.4) (4.66.5)
-Requirement already satisfied: mpmath<1.4,>=1.1.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from sympy==1.13.1->torch==2.5.0) (1.3.0)
-Requirement already satisfied: MarkupSafe>=2.0 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from jinja2->torch==2.5.0) (2.1.5)
-Requirement already satisfied: charset-normalizer<4,>=2 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from requests->transformers==4.42.4) (3.3.2)
-Requirement already satisfied: idna<4,>=2.5 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from requests->transformers==4.42.4) (3.10)
-Requirement already satisfied: urllib3<3,>=1.21.1 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from requests->transformers==4.42.4) (2.2.3)
-Requirement already satisfied: certifi>=2017.4.17 in /Users/kikemori/Documents/mprg/executorch-rs/.venv/lib/python3.12/site-packages (from requests->transformers==4.42.4) (2024.8.30)
+This is a Rust binding for the [executorch](https://pytorch.org/executorch-overview)
+
+## How to use
+1. Download the prebuilt executorch library from the [executorch-prebuilt](https://github.com/kadu-v/pre-built-executorch) website.
+    ```bash
+    #  In the root of the project
+    $ wget https://github.com/kadu-v/pre-built-executorch/releases/download/v0.4.0/release.zip
+    $ unzip release.zip
+    ```
+
+2. Export Executorch home
+    ```bash
+    # Set the executorch home to the above extracted directory
+    $ export EXECUTORCH_HOME=/path/to/executorch-prebuilt
+    ```
+
+4. (Optional) Make `android.env` for android builds. Example:
+    ```.env
+    CXX = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang++
+    CC = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang
+    AR = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar
+    ANDROID_NDK_HOME = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566
+    ANDROID_MIN_API_LEVEL = 35
+    ```
+
+3. Add the following to your `Cargo.toml`
+    ```toml
+    [features]
+    apple = ["executorch/apple"]
+    android = ["executorch/android"]
+
+    [dependencies]
+    executorch = { git = "git@github.com:kadu-v/executorch-rs.git", version = "0.1.0" }
+    ```
+
+
+## Hot to develop
+
+1. Download the prebuilt executorch library from the [executorch-prebuilt](https://github.com/kadu-v/pre-built-executorch) website.
+    ```bash
+    #  In the root of the project
+    $ wget https://github.com/kadu-v/pre-built-executorch/releases/download/v0.4.0/release.zip
+    $ unzip release.zip
+    ```
+
+2. Export Executorch home
+    ```bash
+    # Set the executorch home to the above extracted directory
+    $ export EXECUTORCH_HOME=/path/to/executorch-prebuilt
+    ```
+
+3. Clone the repository
+    ```bash
+    $ git clone git@github.com:kadu-v/executorch-rs.git
+    ```
+
+4. Test the binding
+    ```bash
+    # Test for the apple feature
+    $ cargo test --features apple
+    # Test for the android feature
+    $ cargo test --features android 
+    ```
+
+5. Test the binding on android
+    ```bash
+    # Test for the android feature
+    $ cargo dingphy -d android test --features android --target aarch64-linux-android
+    # Test for the ios
+    $ cargo dinghy -d iphone test --features apple --target aarch64-apple-ios
+    ```
