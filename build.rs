@@ -1,9 +1,6 @@
 #[allow(unused_imports)]
 use dotenvy::from_filename_override;
-use std::{
-    env,
-    path::{Path, PathBuf},
-};
+use std::{env, path::Path};
 
 #[cfg(target_os = "macos")]
 #[allow(dead_code)]
