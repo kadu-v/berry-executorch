@@ -1,4 +1,9 @@
-# executorch-rs
+# berry-executorch
+
+<p align="center">
+    <img src="resource/image/logo.jpeg" alt="berry-executorch" width="200"　height="200">
+</p>J
+
 
 This is the **simplest** Rust binding for the [executorch](https://pytorch.org/executorch-overview)
 
@@ -35,7 +40,7 @@ This is the **simplest** Rust binding for the [executorch](https://pytorch.org/e
     android = ["executorch/android"]
 
     [dependencies]
-    executorch = { git = "git@github.com:kadu-v/executorch-rs.git", version = "0.1.0" }
+    executorch = { git = "git@github.com:kadu-v/berry-executorch.git", version = "0.1.0" }
     ```
 
 
@@ -56,7 +61,7 @@ This is the **simplest** Rust binding for the [executorch](https://pytorch.org/e
 
 3. Clone the repository
     ```bash
-    $ git clone git@github.com:kadu-v/executorch-rs.git
+    $ git clone git@github.com:kadu-v/berry-executorch.git
     ```
 
 4. Test the binding
