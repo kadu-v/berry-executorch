@@ -1,4 +1,4 @@
-use executorch_rs::Module;
+use berry_executorch::Module;
 
 fn main() {
     let file_path = "./resource/model/simple/two.pte";

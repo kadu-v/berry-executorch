@@ -60,7 +60,7 @@ fn forward_model(model_path: &str, expected_class: usize, expected_str: &str) {
 
     let model_path = base_path.join(model_path);
     let mut module =
-        executorch_rs::Module::new(&model_path.display().to_string())
+        berry_executorch::Module::new(&model_path.display().to_string())
             .expect("Failed to create a new module");
     module.load().unwrap();
 

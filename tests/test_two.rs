@@ -1,4 +1,4 @@
-use executorch_rs::Module;
+use berry_executorch::Module;
 
 #[test]
 fn test_two() {

@@ -74,7 +74,7 @@ fn main() {
         println!("Model: {}", file_path);
         let model_path = base_path.join(file_path);
         let mut module =
-            executorch_rs::Module::new(&model_path.display().to_string())
+            berry_executorch::Module::new(&model_path.display().to_string())
                 .expect("Failed to create a new module");
         module.load().unwrap();
 
