@@ -22,4 +22,6 @@ Cargo.lock
 .DS_Store
 .venv/
 
-third_party/executorch-lib/aarch64-linux-android
+
+executorch-prebuilt/
+android.env

@@ -1,6 +1,9 @@
 #[allow(unused_imports)]
 use dotenvy::from_filename_override;
-use std::{env, path::Path};
+use std::{
+    env,
+    path::{Path, PathBuf},
+};
 
 #[cfg(target_os = "macos")]
 #[allow(dead_code)]
@@ -11,11 +14,23 @@ const TARGET_OS: &str = "darwin";
 const TARGET_OS: &str = "linux";
 
 fn main() {
-    let manifest_dir =
+    let manifest_dir_path =
         env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR is not set");
-    let current_path = Path::new(&manifest_dir);
+    let manifest_dir_path = Path::new(&manifest_dir_path);
+
     #[allow(unused_variables)]
     let target_triple = env::var("TARGET").unwrap();
+
+    let profile = env::var("PROFILE").unwrap();
+    let executorch_honme =
+        if let Some(executorch_home) = env::var("EXECUTORCH_HOME").ok() {
+            executorch_home
+        } else {
+            Path::new(&manifest_dir_path)
+                .join("executorch-prebuilt")
+                .display()
+                .to_string()
+        };
 
     /* ------------------------------------------------------------------------
      * Compile C Interface for Executorch used in Rust
@@ -25,12 +40,23 @@ fn main() {
         .cpp(true)
         .file("src/cpp/c_interface.cpp")
         .include("src/cpp")
-        .include("third_party/executorch-lib/include")
+        .include("executorch-prebuilt/include")
         .flag("-std=c++17");
 
     #[cfg(feature = "android")]
     {
-        from_filename_override("android.env")
+        let android_env_path =
+            if let Some(android_env_path) = env::var("ANDROID_ENV_PATH").ok() {
+                PathBuf::from(&android_env_path)
+            } else {
+                Path::new(&manifest_dir_path).join("android.env")
+            };
+        // Check the android.env file exists
+        android_env_path.try_exists().expect(
+            "android.env is not found, so please create it from android.env.sample and export \"ANDROID_ENV_PATH\" environment variable",
+        );
+
+        from_filename_override(android_env_path)
             .expect("Failed to load android.env");
 
         // check the ANDROID_NDK_HOME environment variable
@@ -63,7 +89,6 @@ fn main() {
             .join(min_api_level.to_string());
         let include_path = sysroot_target_path.join("usr/include");
 
-        /*  */
         /* **IMPORTANT**
          * 以下のパスの順番はapi level に対応した ライブラリのパス -> NDK のパス にすること
          * 出ないとリンク時にエラーが発生する
@@ -83,15 +108,18 @@ fn main() {
 
     println!("cargo:rerun-if-changed=cpp/src/c_interface.cpp");
     println!("cargo:rerun-if-changed=cpp/include/c_interface.h");
-    println!("cargo:rerun-if-changed={}/build.rs", current_path.display());
+    println!(
+        "cargo:rerun-if-changed={}/build.rs",
+        manifest_dir_path.display()
+    );
 
     /* ------------------------------------------------------------------------
      * Basic Linking Configuration
      * ------------------------------------------------------------------------ */
+
     println!(
-        "cargo:rustc-link-search={}/third_party/executorch-lib/{}/lib",
-        current_path.display(),
-        target_triple,
+        "cargo:rustc-link-search={}/{}/{}/lib",
+        executorch_honme, target_triple, profile
     );
 
     #[allow(unused_mut)]
