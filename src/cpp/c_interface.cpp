@@ -73,7 +73,6 @@ extern "C"
 
     int32_t *output_sizes = new int32_t[output_tensor.dim()];
     std::copy(output_tensor.sizes().begin(), output_tensor.sizes().end(), output_sizes);
-    // Copy the output tensor to the output array and this is not owned by the callee
 
     return CTensor{
         0,
