@@ -1,7 +1,11 @@
 [package]
 name = "executorch-rs"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
+authors = ["kadu-v (Kazuki Ikemori)"]
+description = "A Rust binding for Executorch"
+repository = "https://github.com/kadu-v/executorch-rs"
+keywords = ["Executorch", "Binding"]
 
 [lib]
 crate-type = ["staticlib", "cdylib", "rlib"]
