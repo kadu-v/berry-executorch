@@ -55,7 +55,7 @@ fn main() {
         );
 
         from_filename_override(android_env_path)
-            .expect("Failed to load android.env");
+            .expect(&format!("Failed to load {}", manifest_dir_path.display()));
 
         // check the ANDROID_NDK_HOME environment variable
         let ndk_home = env::var("ANDROID_NDK_HOME").expect(
