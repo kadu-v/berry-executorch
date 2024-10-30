@@ -11,6 +11,7 @@ This is the **simplest** Rust binding for the [executorch](https://pytorch.org/e
 > This crate is under development and is not yet ready for production use.
 
 ## How to use
+### General
 1. Download the prebuilt executorch library from the [executorch-prebuilt](https://github.com/kadu-v/pre-built-executorch) website.
     ```bash
     #  In the root of the project
@@ -18,19 +19,10 @@ This is the **simplest** Rust binding for the [executorch](https://pytorch.org/e
     $ unzip release.zip
     ```
 
-2. Export Executorch home
-    ```bash
-    # Set the executorch home to the above extracted directory
-    $ export EXECUTORCH_HOME=/path/to/executorch-prebuilt
-    ```
-
-4. (Optional) Make `android.env` for android builds. Example:
-    ```.env
-    CXX = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang++
-    CC = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang
-    AR = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar
-    ANDROID_NDK_HOME = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566
-    ANDROID_MIN_API_LEVEL = 35
+2. Set the `EXECUTORCH_HOME` environment variable to the `.cargo/config.toml` of your crate.
+    ```toml
+    [env]
+    EXECUTORCH_HOME = "/path/to/executorch-prebuilt"
     ```
 
 3. Add the following to your `Cargo.toml`
@@ -43,8 +35,66 @@ This is the **simplest** Rust binding for the [executorch](https://pytorch.org/e
     executorch = { git = "git@github.com:kadu-v/berry-executorch.git", version = "0.1.0" }
     ```
 
+### iOS and Apple Silicon
+1. Add the following to the `build.rs` of your crate.
+    ```rust
+    fn main() {
+        #[cfg(feature = "apple")]
+        {
+            println!("cargo:rustc-link-arg=-fapple-link-rtlib");
+            /* ---------- Foundation framework ------------------------------------ */
+            println!("cargo:rustc-link-arg=-framework");
+            println!("cargo:rustc-link-arg=Foundation");
 
-## Hot to develop
+            /* ---------- Metal backend frmework ---------------------------------- */
+            println!("cargo:rustc-link-arg=-framework");
+            println!("cargo:rustc-link-arg=MetalPerformanceShaders");
+            println!("cargo:rustc-link-arg=-framework");
+            println!("cargo:rustc-link-arg=MetalPerformanceShadersGraph");
+            println!("cargo:rustc-link-arg=-framework");
+            println!("cargo:rustc-link-arg=Metal");
+
+            /* ---------- CoreML backend framework -------------------------------- */
+            println!("cargo:rustc-link-arg=-framework");
+            println!("cargo:rustc-link-arg=CoreML");
+            println!("cargo:rustc-link-arg=-framework");
+            println!("cargo:rustc-link-arg=Accelerate");
+            println!("cargo:rustc-link-lib=sqlite3");
+        }
+    }
+    ```
+
+### Android
+1. Make `android.env` for android builds. Example:
+    ```.env
+    CXX = /path/to/android/ndk/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang++
+    CC = /path/to/android/ndk/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang
+    AR = /path/to/android/ndk/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar
+    ANDROID_NDK_HOME = /Users/user-name/Library/Android/sdk/ndk/28.0.12433566
+    ANDROID_MIN_API_LEVEL = 35
+    ```
+
+    > [!TIPS]
+    > For example, my `android.env` file looks like this:
+    > ```env
+    > CXX = /Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/?bin/aarch64-linux-android35-clang++
+    > CC = /Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang
+    > AR = /Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-ar
+    > ANDROID_NDK_HOME = /Users/kikemori/Library/Android/sdk/ndk/28.0.12433566
+    > ANDROID_MIN_API_LEVEL = 35
+    > ```
+
+2. Add the path of the `android.env` and linker to the `.cargo/config.toml`
+    ```diff
+    [env]
+    EXECUTORCH_HOME = "/path/to/executorch-prebuilt"
+    + ANDROID_ENV_PATH = "/path/to/android.env"
+
+    [target.aarch64-linux-android]
+    linker = "/path/to/android/ndk/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang++"
+    ```
+
+## How to develop
 
 1. Download the prebuilt executorch library from the [executorch-prebuilt](https://github.com/kadu-v/pre-built-executorch) website.
     ```bash
@@ -64,15 +114,7 @@ This is the **simplest** Rust binding for the [executorch](https://pytorch.org/e
     $ git clone git@github.com:kadu-v/berry-executorch.git
     ```
 
-4. Test the binding
-    ```bash
-    # Test for the apple feature
-    $ cargo test --features apple
-    # Test for the android feature
-    $ cargo test --features android 
-    ```
-
-5. Test the binding on android
+4. Test the binding on android and ios
     ```bash
     # Test for the android feature
     $ cargo dingphy -d android test --features android --target aarch64-linux-android
