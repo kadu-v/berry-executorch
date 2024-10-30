@@ -1,3 +1,0 @@
-
-[target.aarch64-linux-android]
-linker = "/Users/kikemori/Library/Android/sdk/ndk/28.0.12433566/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android35-clang++"

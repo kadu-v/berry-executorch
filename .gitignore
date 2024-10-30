@@ -25,3 +25,4 @@ Cargo.lock
 
 executorch-prebuilt/
 android.env
+cargo/
