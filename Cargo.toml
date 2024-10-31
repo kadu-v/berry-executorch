@@ -6,6 +6,7 @@ authors = ["kadu-v (Kazuki Ikemori)"]
 description = "A Rust binding for Executorch"
 repository = "https://github.com/kadu-v/berry-executorch"
 keywords = ["Executorch", "Binding"]
+license = "MIT OR Apache-2.0"
 
 [lib]
 crate-type = ["staticlib", "cdylib", "rlib"]
@@ -20,14 +21,12 @@ mps = []
 android = ["xnnpack", "vulkan"]
 vulkan = []
 
-
 [dependencies]
 thiserror = "1.0.64"
 
 [dev-dependencies]
 imageproc = "0.25.0"
 dinghy-test = "0.7.3"
-
 
 [build-dependencies]
 cc = "1.1.25"
