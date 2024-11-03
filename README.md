@@ -5,7 +5,7 @@
 </p>
 
 
-This is the **simplest** Rust binding for the [executorch](https://pytorch.org/executorch-overview)
+This is the **simplest** Rust binding for [executorch](https://pytorch.org/executorch-overview)
 
 > [!IMPORTANT]
 > This crate is under development and is not yet ready for production use.
