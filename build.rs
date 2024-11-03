@@ -89,7 +89,8 @@ fn main() {
 
         /* **IMPORTANT**
          * 以下のパスの順番はapi level に対応した ライブラリのパス -> NDK のパス にすること
-         * 出ないとリンク時にエラーが発生する
+         * 出ないと実行時にエラーが発生する
+         * `library "libc++_shared.so" not found: needed by main executable`
          * */
         println!("cargo:rustc-link-search={}", platform_lib_path.display());
         println!("cargo:rustc-link-search={}", target_lib_path.display());
@@ -114,7 +115,6 @@ fn main() {
     /* ------------------------------------------------------------------------
      * Basic Linking Configuration
      * ------------------------------------------------------------------------ */
-
     println!(
         "cargo:rustc-link-search={}/{}/{}/lib",
         executorch_home, target_triple, profile
@@ -193,4 +193,22 @@ fn main() {
     for lib in whole_archive_libs {
         println!("cargo:rustc-link-lib=static:+whole-archive={}", lib);
     }
+
+    /* ------------------------------------------------------------------------
+     * Rerun build.rs if the following files are changed
+     * ------------------------------------------------------------------------ */
+    // C Interface
+    println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=src/cpp/c_interface.cpp");
+    println!("cargo:rerun-if-changed=src/cpp/c_interface.h");
+
+    // Executorch configurations
+    println!("cargo:rerun-if-env-changed=EXECUTORCH_HOME");
+    println!("cargo:rerun-if-changed=executorch-prebuilt");
+
+    // Android configurations
+    println!("cargo:rerun-if-env-changed=ANDROID_ENV_PATH");
+    println!("cargo:rerun-if-env-changed=ANDROID_NDK_HOME");
+    println!("cargo:rerun-if-env-changed=ANDROID_MIN_API_LEVEL");
+    println!("cargo:rerun-if-changed=android.env");
 }
