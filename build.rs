@@ -125,7 +125,7 @@ fn main() {
         "extension_tensor",
         "extension_module_static",
         "extension_data_loader",
-        "executorch_no_prim_ops",
+        "executorch_core",
     ];
 
     #[rustfmt::skip]
@@ -141,6 +141,7 @@ fn main() {
     {
         whole_archive_libs.push("xnnpack_backend");
         whole_archive_libs.push("XNNPACK");
+        whole_archive_libs.push("microkernels-prod");
         whole_archive_libs.push("pthreadpool");
         whole_archive_libs.push("cpuinfo");
     }
@@ -193,22 +194,4 @@ fn main() {
     for lib in whole_archive_libs {
         println!("cargo:rustc-link-lib=static:+whole-archive={}", lib);
     }
-
-    /* ------------------------------------------------------------------------
-     * Rerun build.rs if the following files are changed
-     * ------------------------------------------------------------------------ */
-    // C Interface
-    println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed=src/cpp/c_interface.cpp");
-    println!("cargo:rerun-if-changed=src/cpp/c_interface.h");
-
-    // Executorch configurations
-    println!("cargo:rerun-if-env-changed=EXECUTORCH_HOME");
-    println!("cargo:rerun-if-changed=executorch-prebuilt");
-
-    // Android configurations
-    println!("cargo:rerun-if-env-changed=ANDROID_ENV_PATH");
-    println!("cargo:rerun-if-env-changed=ANDROID_NDK_HOME");
-    println!("cargo:rerun-if-env-changed=ANDROID_MIN_API_LEVEL");
-    println!("cargo:rerun-if-changed=android.env");
 }
